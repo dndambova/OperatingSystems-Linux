@@ -347,18 +347,24 @@ ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "(" | sed -e "s/\(.\)
 03-b-9104.
 Да се изведат всички албуми, сортирани по година.
 
-ls songs | cut -f 2 -d "(" | cut -f 1 -d ")" | sort -k 2 -t ,
+ls songs | cut -f 2 -d "(" | cut -f 1 -d ")" | sort -k 2 -t , -n
 
 03-b-9105.
 Да се преброят/изведат само песните на Beatles и Pink.
 
-ls dir5 | egrep --color  "^B|Pink -"
+ls songs | egrep --color  "^B|Pink -"
+find ~/songs -type f | egrep --color "Beatles|Pink -"
+find ~/songs -type f -name "Pink -*" -o -name "Beatles*"
+find ~/songs -type f -name "Pink -*" -o -name "Beatles*" | wc -l (count of songs)
+
 
 03-b-9106.
 Да се направят директории с имената на уникалните групи. За улеснение, имената
 от две думи да се напишат слято:
 
 Beatles, PinkFloyd, Madness
+
+ls songs | sort | cut -f 1 -d - |sed "s/ //g" | uniq |xargs -I {} mkdir {}
 
 
 03-b-9200.
@@ -471,6 +477,8 @@ FOR CHEATSHEET :
 03-B-4002
 03-B-4005
 03-b-9101
+03-b-9105.
+
 
 
 
