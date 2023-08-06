@@ -1,4 +1,4 @@
-03-a-0200.
+/03-a-0200.
 Сортирайте /etc/passwd лексикографски по поле UserID.
 
 cat /etc/passwd | sort -t ":" -k 3
@@ -279,16 +279,17 @@ cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | 
 03-b-8500.
 За всяка група от /etc/group изпишете "Hello, <група>", като ако това е вашата група, напишете "Hello, <група> - I am here!".
 
+cat /etc/group | cut -f 1 -d : | awk -v gr=$(groups) '{if($1==gr) print "Hello, " $1 " - I am here!" ; else print "Hello, " $1}'
 
 03-b-8600.
 Shell Script-овете са файлове, които по конвенция имат разширение .sh. Всеки
 такъв файл започва с "#!<interpreter>" , където <interpreter> указва на
 операционната система какъв интерпретатор да пусне (пр: "#!/bin/bash",
 "#!/usr/bin/python3 -u").
-
 Намерете всички .sh файлове в директорията `/usr` и нейните поддиректории, и
 проверете кой е най-често използваният интерпретатор.
 
+find /usr -type f -name "*.sh" 2>/dev/null | xargs -I {} cat {} | fgrep "#!" | sort | uniq -c | sort -n | tail -n 1
 
 03-b-8700.
 1. Изведете GID-овете на 5-те най-големи групи спрямо броя потребители, за които
@@ -497,6 +498,9 @@ FOR CHEATSHEET :
 03-b-9105.
 03-b-9051.
 03-b-9052.
+03-b-8500.
+03-b-8600.
+
 
 
 
