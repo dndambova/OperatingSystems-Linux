@@ -260,6 +260,7 @@ find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |xargs -I {} ca
 Хистограма наричаме поредица от редове, всеки от които има вида:
 <брой срещания> <какво се среща толкова пъти>
 
+cat /etc/services | egrep -o "[[:alpha:]]+" | sed 's/\(.\)/\L\1/g' | sort | uniq -c | sort -n | tail -n 10 (sed is for case-insensitive)
 
 03-b-8000.
 Вземете факултетните номера на студентите (описани във файла
@@ -268,6 +269,12 @@ find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |xargs -I {} ca
 Студент е част от СИ, ако home директорията на този потребител (според
 <РЕПО>/exercises/data/mypasswd.txt) се намира в /home/SI директорията.
 
+Variant(1)
+cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | sed 's/s//g' | sort -n > ~/si.txt
+Variant(2)
+cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | tr -d s | sort -n > ~/si.txt
+Variant(3)
+cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | egrep -o "[[:digit:]]*" | sort -n > ~/si.txt
 
 03-b-8500.
 За всяка група от /etc/group изпишете "Hello, <група>", като ако това е вашата група, напишете "Hello, <група> - I am here!".
