@@ -246,7 +246,6 @@ find /tmp -type f -readable -printf "%p %m \n" 2>/dev/null
 файл. Намерете 10-те най-скоро достъпени файлове. (hint: Unix time)
 
 
-
 03-b-7000.
 да приемем, че файловете, които съдържат C код, завършват на `.c` или `.h`.
 Колко на брой са те в директорията `/usr/include`?
@@ -370,7 +369,6 @@ find ~/songs -type f | egrep --color "Beatles|Pink -"
 find ~/songs -type f -name "Pink -*" -o -name "Beatles*"
 find ~/songs -type f -name "Pink -*" -o -name "Beatles*" | wc -l (count of songs)
 
-
 03-b-9106.
 Да се направят директории с имената на уникалните групи. За улеснение, имената
 от две думи да се напишат слято:
@@ -378,7 +376,6 @@ find ~/songs -type f -name "Pink -*" -o -name "Beatles*" | wc -l (count of songs
 Beatles, PinkFloyd, Madness
 
 ls songs | sort | cut -f 1 -d - |sed "s/ //g" | uniq |xargs -I {} mkdir {}
-
 
 03-b-9200.
 Напишете серия от команди, които извеждат детайли за файловете и директориите в
