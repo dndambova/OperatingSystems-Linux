@@ -238,6 +238,7 @@ cat /etc/passwd | cut -f 3 -d : | head -n 46| tail -n +28 | egrep -o "[[:digit:]
 Отпечатайте правата (permissions) и имената на всички файлове, до които имате
 read достъп, намиращи се в директорията /tmp. (hint: 'man find', вижте -readable)
 
+find /tmp -type f -readable -printf "%p %m \n" 2>/dev/null
 
 03-b-6900.
 Намерете имената на 10-те файла във вашата home директория, чието съдържание е
@@ -251,6 +252,8 @@ read достъп, намиращи се в директорията /tmp. (hint
 Колко на брой са те в директорията `/usr/include`?
 Колко реда C код има в тези файлове?
 
+find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |wc -l
+find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |xargs -I {} cat {} | wc -l
 
 03-b-7500.
 Даден ви е ASCII текстов файл - /etc/services. Отпечатайте хистограма на 10-те най-често срещани думи.
@@ -298,25 +301,36 @@ Hint: /etc/passwd
 03-b-9050.
 Копирайте файл <РЕПО>/exercises/data/population.csv във вашата home директория.
 
+ready
 
 03-b-9051.
 Използвайки файл population.csv, намерете колко е общото население на света
 през 2008 година. А през 2016?
 
+cat population.csv | grep 2008, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
+cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
 
 03-b-9052.
 Използвайки файл population.csv, намерете през коя година в България има най-много население.
 
+cat population.csv | grep "Bulgaria" | cut -f 3,4 -d ","|awk -F "," 'BEGIN{max=0}{if ($2>max)  max = $2}END{print max}' |xargs -I {} grep {} population.csv| cut -f 3 -d ","
+cat population.csv | grep "Bulgaria" | sort -t "," -k 4 -r | head -n 1
 
 03-b-9053.
 Използвайки файл population.csv, намерете коя държава има най-много население през 2016. А коя е с най-малко население?
 (Hint: Погледнете имената на държавите)
 
+Variant(1)
+cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | tail -n 1 |xargs -I {} grep {} population.csv
+cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | head -n 1 |xargs -I {} grep {} population.csv
+Variant(2)
+cat population.csv | egrep -w "2016" | egrep -o '[[:upper:]][[:upper:]][[:upper:]],[[:digit:]].*'| sort -k 3 -t "," -n | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ","
 
 03-b-9054.
 Използвайки файл population.csv, намерете коя държава е на 42-ро място по
 население през 1969. Колко е населението й през тази година?
 
+cat population.csv | grep 1969, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n -r| head -n 42 |tail -n 1 | xargs -I {} grep {} population.csv
 
 03-b-9100.
 В home директорията си изпълнете командата
@@ -477,6 +491,10 @@ FOR CHEATSHEET :
 03-B-4005
 03-b-9101
 03-b-9105.
+03-b-9051.
+03-b-9052.
+
+
 
 
 
