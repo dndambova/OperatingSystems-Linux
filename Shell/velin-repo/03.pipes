@@ -90,17 +90,16 @@ grep -v "/bin/bash" /etc/passwd | wc -l
 
 03-a-5002.
 Изведете само имената на хората с второ име по-дълго от 6 (>6) символа според /etc/passwd
-cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , |                                                                  !!!
+cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep ".{6,}"
 
 03-a-5003.
 Изведете имената на хората с второ име по-късо от 8 (<=7) символа според /etc/passwd // !(>7) = ?
-cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , |                                                                  !!!
-
+cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$"
 
 03-a-5004.
-Отпечатайте всички редове на файла /etc/passwd, които не съдържат символния низ 'ов'.
+Изведете целите редове от /etc/passwd за хората от 03-a-5003
 
-grep -v "ов" /etc/passwd
+cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$" |xargs -I {} egrep -w {} /etc/passwd
 
 03-a-6000.                                                                                                          !!!
 Копирайте <РЕПО>/exercises/data/emp.data във вашата home директория.
@@ -219,11 +218,11 @@ cat f1 | tr [A-Z][a-z] [a-z][A-Z] >> f2 (all upper chars -> lower && all lower c
 
 cat /etc/passwd | grep -o . | grep -v "a" | wc -l
 
-
 03-b-5300.
 Намерете броя на уникалните символи, използвани в имената на потребителите от
 /etc/passwd.
 
+cat /etc/passwd | cut -f 5 -d : | cut -f 1 -d , | sed "s/ //1" | grep -o . | sort | uniq | wc -l
 
 03-b-5400.
 Отпечатайте всички редове на файла /etc/passwd, които не съдържат символния низ 'ов'.
@@ -233,7 +232,7 @@ grep -v "ов" /etc/passwd
 03-b-6100.
 Отпечатайте последната цифра на UID на всички редове между 28-ми и 46-ред в /etc/passwd.
 
-
+cat /etc/passwd | cut -f 3 -d : | head -n 46| tail -n +28 | egrep -o "[[:digit:]]$"
 
 03-b-6700.
 Отпечатайте правата (permissions) и имената на всички файлове, до които имате
