@@ -99,9 +99,9 @@ cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$"
 03-a-5004.
 Изведете целите редове от /etc/passwd за хората от 03-a-5003
 
-cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$" |xargs -I {} egrep -w {} /etc/passwd
+cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$" | sort | uniq | xargs -I {} egrep -w {} /etc/passwd
 
-03-a-6000.                                                                                                          !!!
+03-a-6000.                                                                                                                    !!!
 Копирайте <РЕПО>/exercises/data/emp.data във вашата home директория.
 Посредством awk, използвайки копирания файл за входнни данни, изведете:
 
