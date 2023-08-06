@@ -185,24 +185,33 @@ file3:
 03-b-4001.
 Във file2 (inplace) подменете всички малки букви с главни.
 
- 
+sed -i 's/\(.\)/\U\1/g' f2 (-i is used to inplace the uper chars in the file) 
 
+sed -i 's/\(.\)/\L\1/g' f2 (UPPER TO LOWER)
+ 
 03-b-4002.
 Във file3 (inplace) изтрийте всички "1"-ци.
 
+sed -i 's/"//g' f3
+sed -i "/1/d" f3 (/d to delete pattern matching line)
 
 03-b-4003.
-Изведете статистика за най-често срещаните символи в трите файла.
+Изведете статистика за най-често срещаните 5 символa в трите файла.
 
+cat f1 f2 f3 | grep -o . | sort | uniq -c | sort | tail -n 5 
 
 03-b-4004.
 Направете нов файл с име по ваш избор, чието съдържание е конкатенирани
 съдържанията на file{1,2,3}.
 
+cat f1 f2 f3 > new_file5
 
 03-b-4005.
 Прочетете текстов файл file1 и направете всички главни букви малки като
 запишете резултата във file2.
+
+sed -e 's/\(.\)/\L\1/g' f1 >> f2
+cat f1 | tr [A-Z][a-z] [a-z][A-Z] >> f2 (all upper chars -> lower && all lower chars -> upper)
 
 
 03-b-5200.
@@ -314,27 +323,36 @@ Hint: /etc/passwd
 В home директорията си изпълнете командата
 curl -o songs.tar.gz "http://fangorn.uni-sofia.bg/misc/songs.tar.gz"
 
+ready
 
 03-b-9101.
 Да се разархивира архивът songs.tar.gz в директория songs във вашата home директория.
 
+mkdir ~/songs/
+tar -xf songs.tar.gz -C ~/songs
 
 03-b-9102.
 Да се изведат само имената на песните.
 
+ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "("
 
 03-b-9103.
 Имената на песните да се направят с малки букви, да се заменят спейсовете с
 долни черти и да се сортират.
 
+03-b-9102 | sed -e "s/\(.\)/\L\1/g" | sed -e "s/ /_/g" | sort
+
+ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "(" | sed -e "s/\(.\)/\L\1/g" | sed -e "s/ /_/g" | sort 
 
 03-b-9104.
 Да се изведат всички албуми, сортирани по година.
 
+ls songs | cut -f 2 -d "(" | cut -f 1 -d ")" | sort -k 2 -t ,
 
 03-b-9105.
 Да се преброят/изведат само песните на Beatles и Pink.
 
+ls dir5 | egrep --color  "^B|Pink -"
 
 03-b-9106.
 Да се направят директории с имената на уникалните групи. За улеснение, имената
@@ -447,6 +465,12 @@ x-yyyyyy zz ww
 
 
 
+
+FOR CHEATSHEET :
+03-B-4001
+03-B-4002
+03-B-4005
+03-b-9101
 
 
 
