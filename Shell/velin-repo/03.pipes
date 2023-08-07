@@ -299,6 +299,12 @@ find /usr -type f -name "*.sh" 2>/dev/null | xargs -I {} cat {} | fgrep "#!" | s
 2. (*) Изведете имената на съответните групи.
 Hint: /etc/passwd
 
+cat /etc/passwd | cut -f 4 -d : | sort -n | uniq -c | sort -k 1 -n | tail -n 5
+
+Variant(1)
+cat /etc/passwd | cut -f 4 -d : | sort -n | uniq -c | sort -k 1 -n | tail -n 5 | tr -s " "|  cut -f 3 -d " " | xargs -I {} grep -w {} /etc/group | cut -f 1 -d :
+Variant(2)
+cat /etc/passwd | cut -f 4 -d : | sort -n | uniq -c | sort -k 1 -n | tail -n 5 | awk '{print $2}'| xargs -I {} grep :{}: /etc/group | cut -f 1 -d :
 
 03-b-9000.
 Направете файл eternity. Намерете всички файлове, намиращи се във вашата home
@@ -502,6 +508,8 @@ FOR CHEATSHEET :
 03-b-9052.
 03-b-8500.
 03-b-8600.
+03-b-3600
+03-b-8700.
 
 
 
