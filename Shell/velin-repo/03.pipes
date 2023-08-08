@@ -109,12 +109,16 @@ cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$" | sort | uniq
 - третия ред
 - последното поле от всеки ред
 - последното поле на последния ред
-- всеки ред, който има повече от 4 полета
+- всеки ред, който има повече от 4 полета  
+     cat emp.data | awk '{if(NF>4) print $F}'
 - всеки ред, чието последно поле е по-голямо от 4
+     cat emp.data | awk '{if($NF>2) print $F}'
 - общия брой полета във всички редове
+     cat emp.data | awk  'BEGIN {counter =0}{if(NF > 0) counter += NF } END {print counter}'
 - броя редове, в които се среща низът Beth
 - най-голямото трето поле и редът, който го съдържа
 - всеки ред, който има поне едно поле
+     cat emp.data | awk '{if(NF>0) print $F}'
 - всеки ред, който има повече от 17 знака
 - броя на полетата във всеки ред и самият ред
 - първите две полета от всеки ред, с разменени места
@@ -214,7 +218,6 @@ cat f1 f2 f3 > new_file5
 sed -e 's/\(.\)/\L\1/g' f1 >> f2
 cat f1 | tr [A-Z][a-z] [a-z][A-Z] >> f2 (all upper chars -> lower && all lower chars -> upper)
 
-
 03-b-5200.
 Намерете броя на символите, различни от буквата 'а' във файла /etc/passwd
 
@@ -247,6 +250,7 @@ find /tmp -type f -readable -printf "%p %m \n" 2>/dev/null
 редактирано най-скоро. На първо място трябва да бъде най-скоро редактираният
 файл. Намерете 10-те най-скоро достъпени файлове. (hint: Unix time)
 
+find ~ -printf "%T@ \n" -type f -maxdepth 1 | sort -r | head -n 10
 
 03-b-7000.
 да приемем, че файловете, които съдържат C код, завършват на `.c` или `.h`.
@@ -312,6 +316,7 @@ cat /etc/passwd | cut -f 4 -d : | sort -n | uniq -c | sort -k 1 -n | tail -n 5 |
 15мин (по възможност изключете .).  Запишете във eternity името (път) на
 файла и времето (unix time) на последната промяна.
 
+find ~ -mmin -15 -type f -printf "%p %T@" > eternity
 
 03-b-9050.
 Копирайте файл <РЕПО>/exercises/data/population.csv във вашата home директория.
@@ -398,6 +403,9 @@ ls songs | sort | cut -f 1 -d - |sed "s/ //g" | uniq |xargs -I {} mkdir {}
 текущата директория, които имат същите права за достъп както най-големият файл
 в /etc директорията.
 
+grep -x <(find /etc -printf "%s %p %M \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " ") <(ls -la ~) (doesn't work)
+
+find . -type f -o -type d -perm $(find /etc -printf "%s %p %m \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " ")
 
 03-b-9300.
 Дадени са ви 2 списъка с email адреси - първият има 12 валидни адреса, а
@@ -510,6 +518,8 @@ FOR CHEATSHEET :
 03-b-8600.
 03-b-3600
 03-b-8700.
+03-b-9200. - doesn't work
+
 
 
 
