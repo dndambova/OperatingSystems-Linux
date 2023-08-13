@@ -1,30 +1,82 @@
 05-a-2000.
 Сменете вашия prompt с нещо по желание. После върнете оригиналния обратно.
 
+export PS1="HEY!"
+
 05-a-2100.
 Редактирайте вашия .bash_profile файл, за да ви поздравява (или да изпълнява някаква команда по ваш избор) всеки път, когато влезете в системата.
-
+DONE
 05-a-2200.
 Направете си ваш псевдоним (alias) на полезна команда.
+
+alias obichamToni='ls -la'
 
 05-b-2000.
 Да се напише shell скрипт, който приканва потребителя да въведе низ (име) и изпечатва "Hello, низ".
 
+#!/bin/bash			
+read -p "Enter name:" name
+printf "Hello, $name \n"
+
 05-b-2800.
 Да се напише shell скрипт, който приема точно един параметър и проверява дали подаденият му параметър се състои само от букви и цифри.
+
+#!/bin/bash
+[ $# -eq 1 ] || exit 1
+[ $(echo $1 | grep -o .|egrep "[[:alnum:]]" | wc -l) -eq $(echo -n $1 | wc -c) ] || exit 2
+echo "Bravo! (test)
 
 05-b-3100.
 Да се напише shell скрипт, който приканва потребителя да въведе низ - потребителско име на потребител от системата - след което извежда на стандартния изход колко активни сесии има потребителят в момента.
 
-05-b-3200.
+(1)
+#!/bin/bash
+read -p "User name: " username
+answer=$(who | grep $username |wc -l)
+printf "$answer \n"
+(2)
+#!/bin/bash
+read -p "User name: " username
+who | grep $username |wc -l
+
+05-b-3200
 Да се напише shell скрипт, който приканва потребителя да въведе пълното име на директория и извежда на стандартния изход подходящо съобщение за броя на всички файлове и всички директории в нея.
+
+#!/bin/bash
+read -p "Enter absolute path " dir
+[ -d $dir ] || exit 1
+files=$(find $dir -maxdepth 1 -type f | wc -l)
+directories=$(find $dir -maxdepth 1 -type d |wc -l)
+printf "Count of files $files and count of directiories $directories \n "
 
 05-b-3300.
 Да се напише shell скрипт, който чете от стандартния вход имената на 3 файла, обединява редовете на първите два (man paste), подрежда ги по азбучен ред и резултата записва в третия файл.
 
+#!/bin/bash
+read -p "File 1: " file1
+read -p "File 2: " file2
+read -p "File 3: " file3
+[ -f $file1 -a -f $file2 -a -f $file3 ] || exit 1
+cat $file1 >> $file2 | sort $file2 >> $file3
+cat $file3 (to test)
+
 05-b-3400.
 Да се напише shell скрипт, който чете от стандартния вход име на файл и символен низ, проверява дали низа се съдържа във файла и извежда на стандартния изход кода на завършване на командата с която сте проверили наличието на низа.
 NB! Символният низ може да съдържа интервал (' ') в себе си.
+
+#!/bin/bash
+read -p "File name: " file
+read -p "Symbolic string: " string
+
+[ -f $file -a ! -z $string] || exit 1
+cat $file | grep -q "$string"
+if (( $(echo $?) == 0 )) ;then
+        printf "Yes, it exists! \n"
+        printf "0 \n"
+else
+        printf "No, sorry. Try again! \n"
+        printf "1 \n"
+fi
 
 05-b-4200.
 Имате компилируем (a.k.a няма синтактични грешки) source file на езика C. Напишете shell script, който да покaзва колко е дълбоко най-дълбокото nest-ване (влагане).
