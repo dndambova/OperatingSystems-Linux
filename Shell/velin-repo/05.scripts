@@ -70,7 +70,7 @@ read -p "Symbolic string: " string
 
 [ -f $file -a ! -z $string] || exit 1
 cat $file | grep -q "$string"
-if (( $(echo $?) == 0 )) ;then
+if (( $(echo $?) == 0 )) ;then                 Variant 2: (if [ $(echo $?) -eq 0 ] ;then)
         printf "Yes, it exists! \n"
         printf "0 \n"
 else
