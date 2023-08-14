@@ -255,6 +255,13 @@ $ ./validint.sh 32 42 0; echo $?
 
 $ ./validint.sh asdf - 280; echo $?
 3
+cl
+#!/bin/bash
+[ $# -eq 3 ] || exit 5
+[ $(echo "$1$2$3" |egrep "^-?[[:digit:]]+-?[[:digit:]]+-?[[:digit:]]+$"| wc -l) -eq 1 ] || exit 3
+[ $2 -lt $3 ] || exit 2
+[ $1 -lt $2 -a $1 -gt $3 ] && exit 1
+[ $1 -ge $2 -a $1 -le $3 ] && exit 0
 
 05-b-4700.
 Да се напише shell скрипт, който форматира големи числа, за да са по-лесни за четене.
@@ -520,6 +527,10 @@ f1  full-dir/
 
 CHEATSHEET
 05-B-4300.
+05-b-4500.
+05-b-4600.
+
+
 
 
 
