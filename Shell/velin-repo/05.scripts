@@ -102,6 +102,72 @@ int main(int argc, char *argv[]) {
 
 Изход:
 The deepest nesting is 2 levels
+(1)
+if [ $# -ne 1 ]
+then
+	echo "Example usage: $0 <file_name>"
+	exit 1
+fi
+
+if [ ! -r $1 ]
+then
+	echo "Error. File $1 does not exist or is not readable"
+	exit 2
+fi
+MAX_NESTING=0
+CURRENT_NESTING=0
+BRACES=$(cat $1 | sed -r 's/[^{}]//g' | sed -r 's/(.)/\1\n/g')
+#BRACES contains all the braces, each one on a new line
+for word in $BRACES
+do
+	echo $word | grep "{" > /dev/null
+	if [ $? -eq 0 ]
+	then
+		CURRENT_NESTING=$((${CURRENT_NESTING}+1))
+		if [ $CURRENT_NESTING -gt $MAX_NESTING ]
+		then
+			MAX_NESTING=$CURRENT_NESTING
+		fi
+	fi
+	echo $word | grep "}" > /dev/null
+	if [ $? -eq 0 ]
+	then
+		CURRENT_NESTING=$((${CURRENT_NESTING}-1))
+	fi
+done
+
+echo "The deepest nesting is $MAX_NESTING levels"
+
+(Borislav-K)
+(2)
+#!/bin/bash
+[ $# -eq 1 ] || exit 2
+[ -f ${1} -a -s $1  ] || exit 1
+cat $1 | egrep -o  '\{|\}' | tr "\{" "1" | tr "\}" "2" | awk 'BEGIN{cnt=0; maxc=0}{if($1==1)cnt=cnt+1;if(maxc<cnt)maxc=cnt; if($1==2)cnt=cnt-1}END{print maxc}'
+
+05-B-4300.
+Напишете shell script, който по подаден като аргумент файл с map между <nickname> -> <реален username> и nickname, ще ви улесни да изпращате съобщения на хората.
+Пример за файл указател:
+tinko s61966
+minko s881234
+ginko s62000
+dinko s77777
+Примерно извикване на програмата:
+./send_message myAddressBook dinko
+И вече може да изпращате съобщения на човека с username s77777
+
+#!/bin/bash
+[ $# -eq 2 ] || exit 1
+[ -e $1 -a -r $1 ] || exit 2
+REAL_USERNAME=$(cat $1 | egrep -w "$2" |awk '{print $2}')
+
+if [ ! -z $REAL_USERNAME ] ;then
+        read -p "You can write a message to $2 !" MESSAGE
+        echo $MESSAGE | write $REAL_USERNAME
+else
+        echo "This nickname does NOT exist!"
+
+fi
 
 05-b-4301.
 Напишете shell script, който автоматично да попълва файла указател от предната задача по подадени аргументи: име на файла указател, пълно име на човека (това, което очакваме да е в /etc/passwd) и избран за него nickname.
@@ -117,6 +183,18 @@ uncleBen <username на Ben Dover в os-server>
 
 ***Бонус: Ако има няколко съвпадения за въведеното име (напр. има 10 човека Ivan Petrov в /etc/passwd), всички те да се показват на потребителя, заедно с пореден номер >=1,
 след което той да може да въведе някой от номерата (или 0 ако не си хареса никого), и само избраният да бъде добавен към указателя.
+
+#!/bin/bash
+[ $# -eq 3 ] || exit 1
+[ -e $1 -a -r $1 ] || exit 2
+[ ! -z "$2" ] || exit 3
+[ ! -z $3 ] || exit 4
+var=$(grep "$2" /etc/passwd | cut -f 1 -d :)
+if [ ! -z $var ] ;then
+        echo "$3 $var" >> $1
+else
+        echo "This user does NOT exist!"
+fi
 
 05-b-4400.
 Напишете shell script, който да приема параметър име на директория, от която взимаме файлове, и опционално експлицитно име на директория, в която ще копираме файлове. Скриптът да копира файловете със съдържание, променено преди по-малко от 45 мин, от първата директория във втората директория. Ако втората директория не е подадена по име, нека да получи такова от днешната дата във формат, който ви е удобен. При желание новосъздадената директория да се архивира.
@@ -409,6 +487,8 @@ $ ./restore.sh full-dir
 $ ls
 f1  full-dir/
 
+CHEATSHEET
+05-B-4300.
 
 
 
