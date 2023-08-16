@@ -380,20 +380,85 @@ junk (1 entry)
 karh-pishtov.txt (8995979 bytes)
 scripts (10 entries)
 
+#!/bin/bash
+[ $# -eq 1 ]|| exit 1
+[ -d $1 ] || exit 2
+
+files=$(find $1 -maxdepth 1 -type f ! -path "*/.*" -printf "%f (%s bytes) \n")  #without hidden files
+dir=$(find $1 -maxdepth 1 -type d)
+
+
+for d in $dir ;do
+        count=$(find $d -type f -o -type d | egrep -v "/\." | wc -l )
+        printf "$d ($count entries) \n"
+
+done
+
+echo "$files"
+
 05-b-7000.
 Да се напише shell скрипт, който приема произволен брой аргументи - имена на файлове. Скриптът да прочита от стандартния вход символен низ и за всеки от зададените файлове извежда по подходящ начин на стандартния изход броя на редовете, които съдържат низа.
 NB! Низът може да съдържа интервал.
 
+if [ $# -eq 0 ]
+then
+	echo "Error. At least 1 file name must be given "
+	exit 2
+fi
+
+for FILE in "$@"
+do
+	if [ ! -f $FILE ] || [ ! -r $FILE ]
+	then
+		echo "Error. $FILE is not a readable file"
+		exit 1
+	fi
+done
+
+read STRING
+echo "String is: ${STRING}"
+for FILE in "$@"
+do
+	COUNT=$(cat "${FILE}" | grep "${STRING}" | wc -l)
+	echo "$COUNT lines for file $FILE"
+done
+
 05-b-7100.
-Да се напише shell скрипт, който приема два параметъра - име на директория и число. Скриптът да извежда на стандартния изход имената на всички обикновени файлове във директорията, които имат размер, по-голям от подаденото число.
+Да се напише shell скрипт, който приема два параметъра - име на директория и число. Скриптът да извежда на стандартния изход имената на всички обикновени файлове във директорията, 
+които имат размер, по-голям от подаденото число.
+
+#!/bin/bash
+[ $# -eq 2 ] || exit 1
+[ -d $1 ] || exit 2
+[ $(echo "$2" | egrep "^[[:digit:]]+$"| wc -l) -eq 1 ] || exit 3
+
+files=$(find $1 -maxdepth 1 -mindepth 1 -type f -printf "%f %s \n" 2>/dev/null )
+numbers=$2
+printf "$files" | awk -v numbers=$numbers '{if ($2 > numbers) print $1}'
 
 05-b-7200.
 Да се напише shell скрипт, който приема произволен брой аргументи - имена на файлове или директории. Скриптът да извежда за всеки аргумент подходящо съобщение:
 	- дали е файл, който може да прочетем
 	- ако е директория - имената на файловете в нея, които имат размер, по-малък от броя на файловете в директорията.
 
+#!/bin/bash
+[ $# -gt 0 ] || exit 1
+for i in "$@" ;do                   (random count of arguments)
+    [ -d $i -o -f $i ] || exit 2
+    [ -r $i ] || exit 3
+    if [ -f $i -a -r $i ] ;then
+        echo "$i is readable!"
+    fi
+    if [ -d $i ] ;then
+         COUNTER=$(find $i -maxdepth 1 -type f 2>/dev/null | wc -l )
+         F_SIZES=$(find $i -maxdepth 1 -type f -printf "%f %s \n" 2>/dev/null)
+         printf "$F_SIZES" | awk -F " " -v var=$COUNTER '{if ($2<var) print $1}'   (awk implementation)
+    fi
+ done
+
 05-b-7500.
-Напишете shell script guess, която си намисля число, което вие трябва да познате. В зависимост от вашия отговор, програмата трябва да ви казва "надолу" или "нагоре", докато не познате числото. Когато го познаете, програмата да ви казва с колко опита сте успели.
+Напишете shell script guess, която си намисля число, което вие трябва да познате. В зависимост от вашия отговор, програмата трябва да ви казва "надолу" или "нагоре", докато не познате числото. 
+Когато го познаете, програмата да ви казва с колко опита сте успели.
 
 ./guess (програмата си намисля 5)
 
@@ -410,17 +475,74 @@ RIGHT! Guessed 5 in 5 tries!
 
 Hint: Един начин да направите рандъм число е с $(( (RANDOM % b) + a  )), което ще генерира число в интервала [a, b]. Може да вземете a и b като параметри, но не забравяйте да направите проверката.
 
+RAND=$(( (RANDOM % 100) + 20  ))                               !
+TOTALTRIES=0
+while true 
+do
+	read -p "Guess: " INPUT
+	echo "${INPUT}" | egrep -v "^[0-9]+$"
+	if [ $? -eq 0 ]
+	then
+		echo "Please enter a number!"
+		continue
+	fi
+	TOTALTRIES=$((${TOTALTRIES}+1))                       !
+	if [ ${INPUT} -eq ${RAND} ]
+	then
+		echo "You win!!! It took you ${TOTALTRIES} tries"
+		exit 0
+	fi
+	if [ ${INPUT} -gt ${RAND} ]
+	then
+		echo "Lesser"
+		continue	
+	fi
+	echo "Greater"
+done
+(Borislav-K)
+
 05-b-7550.
 Да се напише shell скрипт, който приема параметър - име на потребител. Скриптът да прекратява изпълненито на всички текущо работещи процеси на дадения потребител, и да извежда колко са били те.
 NB! Може да тествате по същият начин като описаният в 05-b-4300
 
+#!/bin/bash
+
+[ $# -eq 1 ] || exit 1
+[ $(grep -w $1 /etc/passwd | wc -l) -eq 1 ] || exit 1
+COUNTER=$(ps -u $1 -o pid= | wc -l)
+ps -u $1 -o pid= |  xargs -I {} kill -9 {}
+echo "$COUNTER"
+
 05-b-7700.
 Да се напише shell скрипт, който приема два параметъра - име на директория и число. Скриптът да извежда сумата от размерите на файловете в директорията, които имат размер, по-голям от подаденото число.
+
+if [ $# -ne 2 ]
+then
+	echo "Usage $0 <dir> <int>"
+	exit 2
+fi
+
+if [ ! -d $1 ] || [ ! -r $1 ]
+then
+	echo "Error. $1 must be a readable directory"
+	exit 1
+fi
+
+echo "${2}" | egrep -vq "^[+]?[0-9]+$"
+if [ $? -eq 0 ]
+then
+	echo "Error. $2 must be a positive integer"
+	exit 1
+fi
+
+find ${1} -mindepth 1 -maxdepth 1 -type f -size "+${2}c" -exec stat -c "%s\n" {} \; | awk '{sum+=$1} END {print sum}'
+(Borislav-K)
 
 05-b-7800.
 Да се напише shell скрипт, който намира броя на изпълнимите файлове в PATH.
 Hint: Предполага се, че няма спейсове в имената на директориите
 Hint2: Ако все пак искаме да се справим с този случай, да се разгледа IFS променливата и констуркцията while read -d
+
 
 05-b-8000.
 Напишете shell script, който получава като единствен аргумент име на потребител и за всеки негов процес изписва съобщение за съотношението на RSS към VSZ. Съобщенията да са сортирани, като процесите с най-много заета виртуална памет са най-отгоре.
@@ -473,6 +595,37 @@ Hint:
 echo -e '\033[0m'
 ,за да не се прецакат цветовете на терминала. Това е цветът на "няма цвят".
 
+if [ $# -ne 2 ] && [ $# -ne 1 ]
+then
+	echo "Usage: $0 [-r | -g | -b ] <string>"
+	exit 1
+fi
+
+if [ $# -eq 2 ]
+then 
+	COLOR="f"
+	if [ "${1}" = "-r" ]
+	then
+		COLOR="\033[0;31m"
+	elif [ "${1}" = "-g" ]
+	then
+		COLOR="\033[0;032m"
+	elif [ "${1}" = "-b" ]
+	then
+		COLOR="\033[0;34m"
+	else
+		echo "Invalid color option"
+		exit 2
+	fi
+else 
+	echo "$1"
+	exit
+fi
+
+echo -e "${COLOR}${2}"
+echo -ne '\033[0m'
+(Borislav-K)
+
 05-b-9501.
 Този път програмата ви ще приема само един параметър, който е измежду ("-r", "-b", "-g", "-x").
 Напишете shell script, който приема редовете от stdin и ги изпринтва всеки ред с редуващ се цвят. Цветовете вървят RED-GREEN-BLUE и цветът на първия ред се определя от аргумента.
@@ -480,6 +633,54 @@ echo -e '\033[0m'
 
 Hint: Не забравяйте да връщате цветовете в терминала.
 
+next_color() {
+	if [ "${COLOR}" = "-r" ]
+	then
+		COLOR="-g"
+	elif [ "${COLOR}" = "-g" ]
+	then
+		COLOR="-b"
+	elif [ "${COLOR}" = "-b" ]
+	then
+		COLOR="-r"
+	fi
+}
+if [ $# -ne 1 ]
+then
+	echo "Usage: $0 -r | -b | -g | -x"
+	exit 1
+fi
+
+if [ "${1}" != "-r" ] && [ "${1}" != "-b" ] && [ "${1}" != "-g" ] && [ "${1}" != "-x" ]
+then
+	echo "Usage: $0 -r | -b | -g | -x"
+	exit 1
+fi
+
+if [ "${1}" = "-x" ]
+then
+	while read LINE
+	do
+		echo $LINE
+	done
+else
+	COLOR="${1}"	
+	while read LINE
+	do
+		if [ "${COLOR}" = "-r" ]
+		then
+			echo -e "\033[0;31m${LINE}"
+		elif [ "${COLOR}" = "-g" ]
+		then
+			echo -e "\033[0;32m${LINE}"
+		else
+			echo -e "\033[0;34m${LINE}"
+		fi
+		next_color
+	done
+fi
+
+echo -ne '\033[0m'
 05-b-9600.
 Да се напише shell скрипт, който получава произволен брой аргументи файлове, които изтрива.
 Ако бъде подадена празна директория, тя бива изтрита. Ако подадения файл е директория с поне 1 файл, тя не се изтрива.
@@ -575,6 +776,9 @@ CHEATSHEET
 05-b-4700.
 05-b-4800.
 05-b-6600.
+05-b-7100.
+05-b-7200.
+05-b-7500.
 
 
 
