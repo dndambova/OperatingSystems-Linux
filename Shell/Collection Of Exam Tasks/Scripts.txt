@@ -171,6 +171,33 @@ root 2 0.0 0.0 0 0 ? S 00:00:00 [kthreadd]
 root 3 0.0 0.0 0 0 ? S 00:00:01 [ksoftirqd/0]
 root 5 0.0 0.0 0 0 ? S< 00:00:00 [kworker/0:0H]
 
+#!/bin/bash
+[ $# -eq 1 ] || exit 1
+#[ $(whoami | grep "root" | wc -l) -eq 1 ] || exit 2
+
+#a)
+count_foo_processes=$( ps -u "${1}" -o pid= | wc -l )
+users=$( ps -e --sort=user -o user= | uniq )
+for user in $users ;do
+        user_processes=$(ps -u $user -o pid= | wc -l )
+        if [ $user_processes -gt $count_foo_processes ] ;then
+                echo "$user"
+        fi
+done
+
+#b)
+average_time=$(ps -e -o time= | awk -F ':' 'BEGIN {total = 0}{total+=(($1*3600)+($2*60)+$3)}END{print total/NR}')
+echo "$average_time"
+
+#c)
+ps -u $1 -o time= -o pid= | while read TIME PID ;do
+process=$(echo "$TIME" | awk -F ':' 'BEGIN {seconds = 0}{seconds=(($1*3600)+($2*60)+$3); print seconds}')
+var=$(echo "2*$average_time" | bc -l)
+if [[ $(echo "$process <  $var" |bc -l) -eq 1  ]] ;then
+        echo "$PID"
+fi
+done
+
 Зад. 24 2017-IN-03 
 Напишете скрипт, който извежда името на потребителския акаунт, в чиято home
 директория има най-скоро променен обикновен файл и кой е този файл. 
@@ -288,6 +315,62 @@ root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
 s61934:x:1177:504:Mariq Cholakova:/home/SI/s61934:/bin/bash
 
+#!/bin/bash
+
+
+if [ "$(whoami)" != "root" ]
+then
+	echo "Error. You are not root"
+	exit 1
+fi
+
+TOTAL_ROOT_RSS=$(ps -u "root" -o rss= | awk '{sum+=$1} END {print sum}')
+
+USERS=$(ps -eo user=, | sort | uniq | egrep -v "^root")
+VALID_USERS=""
+for USER in ${USERS}
+do
+	DIR=$(cut -d: -f 1,6 /etc/passwd | egrep "^${USER}:" | cut -d: -f2)
+	#If they have no home directory
+	if [ -z "${DIR}" ] || [ ! -d ${DIR} ]
+	then
+		VALID_USERS="${VALID_USERS} ${USER}"
+		continue
+	fi
+	
+	#If they do not own their directory
+	OWNER=$(stat -c "%U" ${DIR})
+	if [ "${OWNER}" != "${USER}" ]
+	then
+		VALID_USERS="${VALID_USERS} ${USER}"
+		continue
+	fi
+
+	#If they cannot write to their directory
+	ACCESS_RIGHTS=$(stat -c "%a" ${DIR})
+	#User has no write access if the access rights' first digit is not 010(2),011(3),110(6) or 111(7)
+	echo "${ACCESS_RIGHTS}" | egrep -vq "^[2367]"
+	if [ $? -eq 0 ]
+	then
+		VALID_USERS="${VALID_USERS} ${USER}"
+	fi
+done
+
+for USER in ${VALID_USERS}
+do
+	TOTAL_USER_RSS=$(ps -u "${USER}" -o rss= | awk '{sum+=$1} END {print sum}')
+	if [ ${TOTAL_USER_RSS} -gt ${TOTAL_ROOT_RSS} ]
+	then
+		#Kill all processes
+		PROCESSES=$(ps -u "${USER}" -o pid=)
+		for PROCESS in ${PROCESSES}
+		do
+			kill ${PROCESS}
+			sleep 1
+			kill -9 ${PROCESS}
+		done
+	fi
+done
 Зад. 31 2018-SE-01 
 Нека съществува програма за моментна комуникация (Instant messaging), която
 записва логове на разговорите в следния формат:
@@ -1294,3 +1377,5 @@ Average runtime: 1.51 seconds.
 • считаме, че цялата дадена директория се намира върху една файлова система
 • ако два файла имат еднакви хеш-суми, считаме, че са еднакви по съдържание
 
+CHEETSHEET 
+Зад. 30 2017-SE-06
