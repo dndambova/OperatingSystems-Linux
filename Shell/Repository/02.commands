@@ -92,12 +92,15 @@ find ~ -type f -size +42c | xargs -I {} ls -l {} (xargs - ls is just for check)
 Изведете всички обикновени файлове в директорията /tmp които са от вашата група, които имат write права за достъп за група или за останалите(o=w).
 
 groups | xargs -I {} find /tmp -mindepth 1 -maxdepth 1 -type f -perm /022 -group {}
+find /tmp -mindepth 1 -maxdepth 1 -type f -group $(id -g) -perm /g=r,o=r
 
 02-a-5505.
 Изведете всички файлове, които са по-нови от practice/01/f1 ( би трябвало да е създаден като част от по-ранна задача ).
 
 find ~/* -type f -newer ~/practice/01/f1 (without hidden files)
 find ~ -type f -newer practice/01/f1 (with hidden files)
+   or 
+stat --printf "%W"  practice/01/f1 | xargs -I {} find ~ -type f -newermt @{}
 
 02-a-5506.
 Изтрийте файловете в home директорията си по-нови от practice/01/f3 (подайте на rm опция -i за да може да изберете само тези които искате да изтриете).
