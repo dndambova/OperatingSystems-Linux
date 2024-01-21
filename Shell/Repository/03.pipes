@@ -18,6 +18,8 @@ cat /etc/passwd | cut -f 1,5 -d :
 Изведете съдържанието на файла /etc/passwd от 2-ри до 6-ти символ.
 
 cat /etc/passwd | head -c 6 | tail -c 5
+or
+cat /etc/passwd | cut -c 2-6 | head -n 1
 
 03-a-0212.
 Отпечатайте потребителските имена и техните home директории от /etc/passwd.
