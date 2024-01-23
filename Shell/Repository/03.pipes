@@ -354,12 +354,12 @@ cat /etc/passwd | cut -f 4 -d : | sort -n | uniq -c | sort -k 1 -n | tail -n 5 |
 15мин (по възможност изключете .).  Запишете във eternity името (път) на
 файла и времето (unix time) на последната промяна.
 
-find ~ -mmin -15 -type f -printf "%p %T@" > eternity
+find ~ -mmin -15 -type f -printf "%p %T@ \n" > eternity
 
 03-b-9050.
 Копирайте файл <РЕПО>/exercises/data/population.csv във вашата home директория.
 
-ready
+cp /srv/fmi-os/exercises/data/population.csv ~
 
 03-b-9051.
 Използвайки файл population.csv, намерете колко е общото население на света
@@ -367,28 +367,36 @@ ready
 
 cat population.csv | grep 2008, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
 cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
+or
+cat population.csv | grep  ",2008," | rev | cut -f 1 -d , | rev| awk 'BEGIN{sum=0}{sum = sum + $1}END{print sum}'
+
 
 03-b-9052.
 Използвайки файл population.csv, намерете през коя година в България има най-много население.
 
 cat population.csv | grep "Bulgaria" | cut -f 3,4 -d ","|awk -F "," 'BEGIN{max=0}{if ($2>max)  max = $2}END{print max}' |xargs -I {} grep {} population.csv| cut -f 3 -d ","
-cat population.csv | grep "Bulgaria" | sort -t "," -k 4 -r | head -n 1
+or
+cat population.csv | grep "Bulgaria" | sort -t "," -k 4 -r | head -n 1 | cut -f 3 -d ,
 
 03-b-9053.
 Използвайки файл population.csv, намерете коя държава има най-много население през 2016. А коя е с най-малко население?
 (Hint: Погледнете имената на държавите)
 
-Variant(1)
 cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | tail -n 1 |xargs -I {} grep {} population.csv
 cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | head -n 1 |xargs -I {} grep {} population.csv
-Variant(2)
+or
 cat population.csv | egrep -w "2016" | egrep -o '[[:upper:]][[:upper:]][[:upper:]],[[:digit:]].*'| sort -k 3 -t "," -n | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ","
+or
+cat population.csv | grep ",2016," | rev | cut -f 1 -d , | rev| sort -n | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ,
 
 03-b-9054.
 Използвайки файл population.csv, намерете коя държава е на 42-ро място по
 население през 1969. Колко е населението й през тази година?
 
 cat population.csv | grep 1969, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n -r| head -n 42 |tail -n 1 | xargs -I {} grep {} population.csv
+or
+cat population.csv | grep ",1969," | rev | cut -f 1 -d , | rev| sort -n | head -n 42 | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ,
+
 
 03-b-9100.
 В home директорията си изпълнете командата
