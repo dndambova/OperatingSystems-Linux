@@ -107,8 +107,8 @@ cat /etc/passwd | cut -f 2 -d" " | cut -f 1 -d , | egrep "^.{,7}$" | sort | uniq
 Копирайте <РЕПО>/exercises/data/emp.data във вашата home директория.
 Посредством awk, използвайки копирания файл за входнни данни, изведете:
 
-NF The number of fields in the current input record.
-NR The total number of input records seen so far.
+NF The number 
+NR The total number of LINES.
 OFS The output field separator, a space by default.
 ORS The output record separator, by default a newline.
 
@@ -365,11 +365,10 @@ cp /srv/fmi-os/exercises/data/population.csv ~
 Използвайки файл population.csv, намерете колко е общото население на света
 през 2008 година. А през 2016?
 
-cat population.csv | grep 2008, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
-cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
+cat population.csv | grep 2008, | egrep -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
+cat population.csv | grep 2016, | egrep -o --color "\<[[:digit:]]+$" | awk 'BEGIN{s=0}{s = s + $1} END{print s}'
 or
 cat population.csv | grep  ",2008," | rev | cut -f 1 -d , | rev| awk 'BEGIN{sum=0}{sum = sum + $1}END{print sum}'
-
 
 03-b-9052.
 Използвайки файл population.csv, намерете през коя година в България има най-много население.
@@ -382,8 +381,8 @@ cat population.csv | grep "Bulgaria" | sort -t "," -k 4 -r | head -n 1 | cut -f 
 Използвайки файл population.csv, намерете коя държава има най-много население през 2016. А коя е с най-малко население?
 (Hint: Погледнете имената на държавите)
 
-cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | tail -n 1 |xargs -I {} grep {} population.csv
-cat population.csv | grep 2016, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n | head -n 1 |xargs -I {} grep {} population.csv
+cat population.csv | grep 2016, | egrep -o --color "\<[[:digit:]]+$" | sort -n | tail -n 1 |xargs -I {} grep {} population.csv
+cat population.csv | grep 2016, | egrep -o --color "\<[[:digit:]]+$" | sort -n | head -n 1 |xargs -I {} grep {} population.csv
 or
 cat population.csv | egrep -w "2016" | egrep -o '[[:upper:]][[:upper:]][[:upper:]],[[:digit:]].*'| sort -k 3 -t "," -n | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ","
 or
@@ -393,7 +392,7 @@ cat population.csv | grep ",2016," | rev | cut -f 1 -d , | rev| sort -n | tail -
 Използвайки файл population.csv, намерете коя държава е на 42-ро място по
 население през 1969. Колко е населението й през тази година?
 
-cat population.csv | grep 1969, | egrep -w -o --color "\<[[:digit:]]+$" | sort -n -r| head -n 42 |tail -n 1 | xargs -I {} grep {} population.csv
+cat population.csv | grep 1969, | egrep -o --color "\<[[:digit:]]+$" | sort -n -r| head -n 42 |tail -n 1 | xargs -I {} grep {} population.csv
 or
 cat population.csv | grep ",1969," | rev | cut -f 1 -d , | rev| sort -n | head -n 42 | tail -n 1 | xargs -I {} grep {} population.csv | cut -f 1 -d ,
 
@@ -452,9 +451,9 @@ ls songs | sort | cut -f 1 -d - |sed "s/ //g" | uniq |xargs -I {} mkdir {}
 в /etc директорията.
 
 Variant (1)
-grep -f <(find /etc -printf "%s %p %M \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " " | sed s/-//1) <(ls -l)
+grep -f <(find /etc -printf "%s %p %M \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " " | sed s/-//1) <(ls -la)
 Variant(2)
-find . -type f -o -type d -perm $(find /etc -printf "%s %p %m \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " ")
+find . -maxdepth 1 -mindepth 1 -type f -o -type d -perm $(find /etc -printf "%s %p %m \n" 2>/dev/null | sort -r -k 1 -n | head -n 1 | cut -f 3 -d " ")
 
 03-b-9300.
 Дадени са ви 2 списъка с email адреси - първият има 12 валидни адреса, а
