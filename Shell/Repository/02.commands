@@ -125,15 +125,8 @@ find /etc  -maxdepth 1 -mindepth 1 -type f -perm -u=r,g=r,o=r -exec cp {} ~/myet
 Изтрийте директорията myetc и цялото и съдържание.
 Изтрийте архива c_start.tar.
 
-Начин 1
-find ~/myetc/c* | xargs -I {} tar -cf c_start.tar {}
-find ~/myetc -type f -name "c*" | xargs -I {} tar -cf c_start.tar {}
-rm -r ~/myetc
-rm -r ~/c_start.tar    # Грешен начин, защото файловете в архива се презаписват и накрая остава само последния
-
-Начин 2
-find ~/myetc -name "c*" -exec cp {} arch \; | tar -cf c_start.tar arch/
-tar -xf c_start.tar -C ~   #Грешен начин, защото накрая файловете не са в архива, а са в папка, която е в архива - ТОЗИ НАЧИН Е ПО-ВЕРЕН
+tar -cf c_start.tar $(find myetc -name "c*")
+tar -xf c_start.tar -C ~   
 
 02-a-9500.
 Използвайки едно извикване на командата find, отпечатайте броя на редовете във всеки обикновен файл в /etc директорията.
