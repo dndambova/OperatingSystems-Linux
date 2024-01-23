@@ -221,13 +221,13 @@ sed -i 's/\(.\)/\L\1/g' f2 (UPPER TO LOWER)
 03-b-4002.
 Във file3 (inplace) изтрийте всички "1"-ци.
 
-sed -i 's/"//g' f3
+sed -i 's/1//g' f3
 sed -i "/1/d" f3 (/d to delete pattern matching line)
 
 03-b-4003.
 Изведете статистика за най-често срещаните 5 символa в трите файла.
 
-cat f1 f2 f3 | grep -o . | sort | uniq -c | sort | tail -n 5 
+cat f1 f2 f3 | grep -o . | sort | uniq -c | sort -r | head -n 5 
 
 03-b-4004.
 Направете нов файл с име по ваш избор, чието съдържание е конкатенирани
@@ -245,7 +245,9 @@ cat f1 | tr [A-Z][a-z] [a-z][A-Z] >> f2 (all upper chars -> lower && all lower c
 03-b-5200.
 Намерете броя на символите, различни от буквата 'а' във файла /etc/passwd
 
-cat /etc/passwd | grep -o . | grep -v "a" | wc -l
+cat /etc/passwd | tr -d " "| grep -o . | grep -v "a" | wc -l
+or
+sed 's/a//g' /etc/passwd | wc -m (new lines exists)
 
 03-b-5300.
 Намерете броя на уникалните символи, използвани в имената на потребителите от
@@ -262,27 +264,35 @@ grep -v "ов" /etc/passwd
 Отпечатайте последната цифра на UID на всички редове между 28-ми и 46-ред в /etc/passwd.
 
 cat /etc/passwd | cut -f 3 -d : | head -n 46| tail -n +28 | egrep -o "[[:digit:]]$"
+or
+cat /etc/passwd | cut -f 3 -d : | head -n 46 | tail -n +28 | rev | cut -c 1
 
 03-b-6700.
 Отпечатайте правата (permissions) и имената на всички файлове, до които имате
 read достъп, намиращи се в директорията /tmp. (hint: 'man find', вижте -readable)
 
-find /tmp -type f -readable -printf "%p %m \n" 2>/dev/null
+find /tmp -maxdepth 1 -mindepth 1 -type f -readable -printf "%p %m \n" 2>/dev/null
 
 03-b-6900.
 Намерете имената на 10-те файла във вашата home директория, чието съдържание е
 редактирано най-скоро. На първо място трябва да бъде най-скоро редактираният
 файл. Намерете 10-те най-скоро достъпени файлове. (hint: Unix time)
 
-find ~ -maxdepth 1 -printf "%p %T@ \n" -type f  | sort -r | head -n 10
+find ~ -maxdepth 1 -printf "%p %T@ \n" -type f  | sort -r | head -n 10 (MODIFY TIME)
+find ~ -maxdepth 1 -printf "%p %A@ \n" -type f  | sort -r | head -n 10 (ACCESS TIME)
 
 03-b-7000.
-да приемем, че файловете, които съдържат C код, завършват на `.c` или `.h`.
+Да приемем, че файловете, които съдържат C код, завършват на `.c` или `.h`.
 Колко на брой са те в директорията `/usr/include`?
 Колко реда C код има в тези файлове?
 
 find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |wc -l
 find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |xargs -I {} cat {} | wc -l
+or
+find /usr/include -type f | egrep ".+((\.h)$|(\.c)$)" | wc -l
+or
+find /usr/include -maxdepth 1 -type f -name "*.[hc]" |wc -l
+
 
 03-b-7500.
 Даден ви е ASCII текстов файл - /etc/services. Отпечатайте хистограма на 10-те най-често срещани думи.
@@ -291,6 +301,9 @@ find /usr/include -maxdepth 1 -type f -name "*.c" -o -name "*.h" |xargs -I {} ca
 <брой срещания> <какво се среща толкова пъти>
 
 cat /etc/services | egrep -o "[[:alpha:]]+" | sed 's/\(.\)/\L\1/g' | sort | uniq -c | sort -n | tail -n 10 (sed is for case-insensitive)
+or
+cat /etc/services | egrep -o "[[:alpha:]]+" | tr [A-Z] [a-z] | sort | uniq -c | sort -n | tail -n 10 (sed is for case-insensitive)
+
 
 03-b-8000.
 Вземете факултетните номера на студентите (описани във файла
@@ -299,12 +312,13 @@ cat /etc/services | egrep -o "[[:alpha:]]+" | sed 's/\(.\)/\L\1/g' | sort | uniq
 Студент е част от СИ, ако home директорията на този потребител (според
 <РЕПО>/exercises/data/mypasswd.txt) се намира в /home/SI директорията.
 
-Variant(1)
 cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | sed 's/s//g' | sort -n > ~/si.txt
-Variant(2)
+or
 cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | tr -d s | sort -n > ~/si.txt
-Variant(3)
+or
 cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | egrep -o "[[:digit:]]*" | sort -n > ~/si.txt
+or
+cat /srv/fmi-os/exercises/data/mypasswd.txt | grep "/home/SI" | cut -f 1 -d : | cut -c 2- | sort -n > ~/si.txt
 
 03-b-8500.
 За всяка група от /etc/group изпишете "Hello, <група>", като ако това е вашата група, напишете "Hello, <група> - I am here!".
@@ -319,7 +333,7 @@ Shell Script-овете са файлове, които по конвенция 
 Намерете всички .sh файлове в директорията `/usr` и нейните поддиректории, и
 проверете кой е най-често използваният интерпретатор.
 
-find /usr -type f -name "*.sh" 2>/dev/null | xargs -I {} cat {} | fgrep "#!" | sort | uniq -c | sort -n | tail -n 1
+find /usr -type f -name "*.sh" | xargs -I {} cat {} | grep "#!"|tr -d " " | sort | uniq -c | sort -n | tail -n 1
 
 03-b-8700.
 1. Изведете GID-овете на 5-те най-големи групи спрямо броя потребители, за които
