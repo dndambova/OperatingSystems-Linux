@@ -419,14 +419,16 @@ ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "("
 Имената на песните да се направят с малки букви, да се заменят спейсовете с
 долни черти и да се сортират.
 
-03-b-9102 | sed -e "s/\(.\)/\L\1/g" | sed -e "s/ /_/g" | sort
-
 ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "(" | sed -e "s/\(.\)/\L\1/g" | sed -e "s/ /_/g" | sort 
+or
+ls songs | cut -f 2 -d "-" | sed -e 's/ //1' | cut -f 1 -d "(" | tr [A-Z] [a-z]| tr " " "_" | sort
 
 03-b-9104.
 Да се изведат всички албуми, сортирани по година.
 
 ls songs | cut -f 2 -d "(" | cut -f 1 -d ")" | sort -k 2 -t , -n
+or
+ls songs | sort -k 2 -t ,
 
 03-b-9105.
 Да се преброят/изведат само песните на Beatles и Pink.
