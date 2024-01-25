@@ -45,7 +45,10 @@ ps -g root -o rss= | awk 'BEGIN{sum=0;count=0}{sum=sum+$1 ; count=count+1} END{i
 04-b-8000.
 Намерете всички PID и техните команди (без аргументите), които нямат tty, което ги управлява. 
 Изведете списък само с командите без повторения.
+
 ps -eo comm= -o tty= -o pid= | fgrep "?" | grep -v grep | sort -k 1 -t " " |sed s/""?//g | awk -F "   " '{print $1}' | uniq
+or
+ps -eo pid= -o comm= -o tty= | grep "?" | awk '{print $2}' | sort | uniq -c | awk '{if ($1 < 2) print $2}'
 
 04-b-9000.
 Да се отпечатат PID на всички процеси, които имат повече деца от родителския си процес.
