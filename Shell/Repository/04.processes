@@ -3,7 +3,7 @@
 (1)
 ps -e -o etimes -o comm | sort -n -k 1 | tail -n 10 | cut -f 2 -d " "
 (2)
-ps -e -o cmd = --sort=start_time | head -n 10
+ps -e -o cmd= --sort=start_time | head -n 10
 
 04-a-6000.
 Намерете PID и командата на процеса, който заема най-много виртуална памет в системата.
