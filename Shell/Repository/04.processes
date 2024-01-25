@@ -1,7 +1,7 @@
 04-a-5000.
 Намерете командите на 10-те най-стари процеси в системата.
 (1)
-ps -e -o etimes -o comm | sort -n -k 1 | tail -n 10 | awk '{$1 = ""}{print}'
+ps -e -o etimes -o comm | sort -n -k 1 | tail -n 10 | cut -f 2 -d " "
 (2)
 ps -e -o cmd = --sort=start_time | head -n 10
 
