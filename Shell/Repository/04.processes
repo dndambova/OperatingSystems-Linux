@@ -27,6 +27,9 @@ ps -g root -o rsz= | awk 'BEGIN {sum=0}{sum += $1} END {print sum}'
 ps -o user= -o cmd= -C vim| sort -k 1 | uniq -c | awk '{if ($1>=2) print $2}'
 (2)
 ps -o user= -o cmd= |grep vim | grep -v grep | sort -k 1 | uniq -c | awk '{if ($1>=2) print $2}'
+(3)
+ps -e -o user -o comm | sort | uniq -c | grep "vim"| awk '{if ($1>1) print $2}'
+
 
 04-b-6200.
 Изведете имената на потребителите, които не са логнати в момента, но имат живи процеси.
@@ -37,7 +40,7 @@ grep -vf <(who | cut -f 1 -d " " | sort | uniq ) <(ps -eo user) | sort | uniq
 Намерете колко физическа памет заемат осреднено всички процеси на потребителската група root.
 Внимавайте, когато групата няма нито един процес.
 
-ps -g root -o rsz= | sort -n | uniq -c | awk 'BEGIN{average =0; sum=0}{if($2!=0) {sum += ($1 * $2); average += $1 } else {sum += 0; average +=$1}}END{print sum/average}'
+ps -g root -o rss= | awk 'BEGIN{sum=0;count=0}{sum=sum+$1 ; count=count+1} END{if (sum==0) print sum ; else print (sum/count)}'
 
 04-b-8000.
 Намерете всички PID и техните команди (без аргументите), които нямат tty, което ги управлява. 
